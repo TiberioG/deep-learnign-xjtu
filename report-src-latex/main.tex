@@ -81,13 +81,7 @@ From a mathematical prospective, transfer learning can be described as follows. 
 
 Is intuitive that the benefits brought from a transfer learning approach are numerous. In the above mentioned book, the authors summarise them in three main blocks: a higher start in the performance curve (the initial skill, before refining the model, on the source model is higher than it otherwise would be), a higher slope (the rate of improvement of skill during training of the source model is steeper than it otherwise would be) and a higher maximum possible performance (the converged skill of the trained model is better than it otherwise would be).
 
-To practically demonstrate the above mentioned advantages, reaserches Kafeng Wang, Xitong Gao, Yiren Zhao, Xingjian Li, Dejing Dou and Cheng-Zhong Xu compared transfer learning to traditional compression methods and stated in the paper "Pay Attention to Features, Transfer Learn Faster CNNs" how transfer learning offers the chance for CNNs to learn with limited data samples by transferring knowledge from models pretrained on large datasets. Transfer learning methodology not only is capable to determine a new model with a higher target task accuracy, but also further accelerates it by computing a subset of channel neurons in each convolutional layers and under a wide range of datasets, the smallest drop in validation accuracies under the same speed-up constraints when compared to traditional compression methods.
-
-\begin{equation}
-BCE=-\frac{1}{N} \sum_{i=1}^{N} y_{i} \cdot \log \left(f\left(x_{i}\right)\right)+\left(1-y_{i}\right) \cdot \log \left(1-f\left(x_{i}\right)\right)
-\end{equation}
-
-
+To practically demonstrate the above mentioned advantages, Kafeng Wang et al.,\cite{Wang2020PayAT} compared transfer learning to traditional compression methods and stated  how transfer learning offers the chance for CNNs to learn with limited data samples by transferring knowledge from models pre-trained on large datasets. Transfer learning methodology not only is capable to determine a new model with a higher target task accuracy, but also further accelerates it by computing a subset of channel neurons in each convolutional layers and under a wide range of datasets, the smallest drop in validation accuracy under the same speed-up constraints when compared to traditional compression methods.
 
 
 \subsection{ Deep Learning Frameworks}
@@ -109,7 +103,7 @@ PyTorch is developed by the Torch team and is a Python-first deep learning frame
 
 \textbf{Face mask detection}. Contrarily face mask detection goes beyond classification that directs subsequent face localization and classification either wearing mask or not. Therefore given input images the model designates to predict bounding boxes with respect to the objects and determine associated correct labels for each predicted bounding box. Recently, the utilization of pre-trained network alongside developing on-top-of off-the-shelf state-of-the-art object detection framework such as  one-stage framework comprises YOLO\cite{Redmon2016YouOL} and its variants \cite{Redmon2018YOLOv3AI} and SSD\cite{Liu2016SSDSS} or two-stage approach resembling Faster R-CNN\cite{Ren2015FasterRT}. Among those is \cite{Loey2020FightingAC} that developed a mask detector constructed around YOLOv2 but replacing the darknet backbone with pre-trained ResNet50 which benefited by skip-connections to create more useful representation for YOLOv2 localizer. In contrast, \cite{Qin2020} introduced SRCNet assembled from a super-resolution module as input quality enhancer before forwarded into the classifier. The super-resolution module will restore image details from low-resolution images so as the classifier gets restored inputs which significantly improve accuracy on low quality images. While the feature pyramid network was proposed by \cite{Jiang2020} for enriching the output semantic features by concatenating multiple-level feature maps for the detector inputs. This is resulting in comparable improvement on accuracy metrics relative to the baseline.
 
-\textbf{Transfer learning}. The training regime via transfer learning or so called knowledge transfer appeared to be standard trick in deep learning application. This allows to transfer knowledge either from different or related domain, tasks, and distributions between the source and target \cite{Pan2010ASO, Torrey2009Chapter1T}. Predominantly, the source domain for computer vision task is using natural images belonging to ImageNet\cite{5206848} dataset for creating pre-trained model. While the standard techniques in transfer learning for visual task branched into two which include "fixed-feature transfer" --- freezing the backbone and replace the classifier with task-specific networks --- and "full-network transfer"\cite{Salman2020DoAR} --- fine-tuning the whole networks. Early study on transfer learning employed dimensionality reduction to construct latent features as a proxy for connecting the source with target latent features thru minimizing the distance in this latent space\cite{Pan2008}. Yosinski et.al \cite{Yosinski2014HowTA}, examine the transferability of pre-trained neural networks which deduced that transferability declines as the domain gap between source and target task is high. But, weight initialization from pre-trained resulted in better generalization and accuracy than initializing randomly. Later, layer-wise transferability features problem is resolved via Deep Adaptation Network (DAN) by \cite{DBLP:conf/icml/LongC0J15} with projecting those into kernel Hilbert space and diminishing between domains inconsistency. While, \cite{Kornblith2019DoBI} studied comprehensively the correlation of the performance of ImangeNet pre-trained on the downstream task and found that training regime such as regularization used is susceptible to downgrading the downstream task and not overly beneficial for fine-grained tasks.
+\textbf{Transfer learning}. The training regime via transfer learning or so called knowledge transfer appeared to be standard trick in deep learning application. This allows to transfer knowledge either from different or related domain, tasks, and distributions between the source and target \cite{Pan2010ASO, Torrey2009Chapter1T}. Predominantly, the source domain for computer vision task is using natural images belonging to ImageNet\cite{5206848} dataset for creating pre-trained model. While the standard techniques in transfer learning for visual task branched into two which include "fixed-feature transfer" --- freezing the backbone and replace the classifier with task-specific networks --- and "full-network transfer"\cite{Salman2020DoAR} --- fine-tuning the whole networks. Early study on transfer learning employed dimensionality reduction to construct latent features as a proxy for connecting the source with target latent features thru minimizing the distance in this latent space\cite{Pan2008}. Yosinski et al., \cite{Yosinski2014HowTA}, examine the transferability of pre-trained neural networks which deduced that transferability declines as the domain gap between source and target task is high. But, weight initialization from pre-trained resulted in better generalization and accuracy than initializing randomly. Later, layer-wise transferability features problem is resolved via Deep Adaptation Network (DAN) by \cite{DBLP:conf/icml/LongC0J15} with projecting those into kernel Hilbert space and diminishing between domains inconsistency. While, \cite{Kornblith2019DoBI} studied comprehensively the correlation of the performance of ImangeNet pre-trained on the downstream task and found that training regime such as regularization used is susceptible to downgrading the downstream task and not overly beneficial for fine-grained tasks.
 
 \section{Proposed Method}
 
@@ -134,6 +128,19 @@ In classification task, the dataset should have balance in the number of instanc
 \label{bench}
 \end{figure}
 
+\subsection{Features Transfer in Binary Classification}
+Binary classification task aims to predict the label $\hat{y_{i}}$ given input $x_{i}$ with $\hat{y_{i}} \in \left \{ 0,1 \right \}$. Let the $\theta_{p}$ denotes the pre-trained weight from the ImageNet pre-trained model for features extraction. We used this pre-trained weight as initialization of the model $f(.;\theta_{p})$ while training on the batches of the dataset. While in this experiment, we did not freeze the features extractor and let the training steps fine-tune the weight of both features extractor and the classifier. Then, we has an objective to minimize the loss value to obtained best parameters $\theta$ given given image-label pairs in a batch approximately equivalent to dataset distribution $D$  
+
+\begin{equation}
+    \min_{\theta} \mathbb{E}_{\left ( x,y \right ) \sim  D} \left [ \mathcal{L}\left ( f(x;\theta), y \right ) \right ]
+\end{equation}
+. In this context, we employ binary cross entropy loss or so called $BCE$ in short which measure the binary cross entropy between the target $y$ and the output $f(x)$ as following equation
+Eq.(\ref{eqn:binaryloss}) which the gradient with respect to this loss will be used as the learning projection in parameters space 
+
+\begin{equation}
+\label{eqn:binaryloss}
+BCE=-\frac{1}{N} \sum_{i=1}^{N} y_{i} \cdot \log \left(f\left(x_{i}\right)\right)+\left(1-y_{i}\right) \cdot \log \left(1-f\left(x_{i}\right)\right)
+\end{equation}.
 
 \subsection{Architectures Variation}
 
@@ -144,22 +151,25 @@ In this report, we proposed two CNN-based models for face mask detection with di
 EfficientNet is a group of convolutional neural network models consisting of eight models from B0 to B7, with each subsequent model number referring to variants with more parameters and higher accuracy. EfficientNet model architecture will have to scale in three stages: (I) Depthwise Convolution and Pointwise Convolution, (II)Inverse ResNet blocks consisting of a layer that squeezes the channels, then a layer that extends the channels and (III) Linear bottleneck that uses linear activation to prevent loss of information from ReLU.\cite{DBLP:journals/corr/abs-1905-11946}
 
 \subsubsection{ResNet}
-The deeper the shallow CNN network, the better the effect, but increasing the number of layers after reaching a certain depth will cause the network to converge more slowly and the accuracy rate becomes worse. To solve this problem, the ResNET was born.\\
-The basic idea of ResNet is to introduce a "shortcut connection" that can skip one or more layers to improve performance.\\
-In this experiment, we designed XXX
+The deeper the shallow CNN network, the better the effect, but increasing the number of layers after reaching a certain depth will cause the network to converge more slowly and the accuracy rate becomes worse. To solve this problem, the ResNET was born.The basic idea of ResNet is to introduce a "shortcut connection" that can skip one or more layers to improve performance.
 
 \subsubsection{Xception}%done!
 Xception stands for \textit{Extreme version of Inception}, it is a convolutional neural network architecture that relies solely on depthwise separable convolution layers.
 A depthwise separable convolution splits a kernel into 2 separate ones that do two convolutions: 
 \begin{enumerate}
-    \item depthwise convolution
-    \item pointwise convolution
+    \item Depthwise Convolution \\
+    This module deals not just with the spatial dimensions, but also with the depth dimension (n. of channels) because the spatial convolution is performed independently over each channel of the input.
+    \item Pointwise Convolution \\
+    This is so named because it uses a 1x1 kernel, projecting the channels output by the depthwise convolution onto a new channel space. In short, the Xception architecture is a linear stack of depthwise separable convolution layers with residual connections. Xception architecture has overperformed VGG-16, ResNet and Inception V3 in most classical classification challenges \cite{xception}.
 \end{enumerate}
-The first one is so named because it deals not just with the spatial dimensions, but also with the depth dimension (n. of channels) because the spatial convolution is performed independently over each channel of the input.\\
-The second one is so named because it uses a 1x1 kernel, projecting the channels output by the depthwise convolution onto a new channel space.
-In short, the Xception architecture is a linear stack of
-depthwise separable convolution layers with residual connections.
-Xception architecture has overperformed VGG-16, ResNet and Inception V3 in most classical classification challenges \cite{xception}.
+
+\subsubsection{MobileNetV2} 
+Improved version of mobile architecture developed by Google Research \cite{Sandler2018MobileNetV2IR}, MobileNetV2 is a multi-task-purpose state-of-the-art backbone specialized for mobile devices. This architecture is built on top of three essential components named inverted residual block, lightweight depthwise separable convolutional layer, and linear bottlenecks. Additionally, some tricks are used for accuracy improvement including chop off the non-linearity in narrow layers as the effort to build better features representation thru preserving the information. The originated research has proven that this architecture is applicable for various visual tasks such as object detection or object segmentation.  
+
+\subsubsection{MnasNet}
+Designed specifically for mobile device deployment, MnasNet\cite{Tan2019MnasNetPN} is developed by a similar group who founded MobileNet. The networks structure was developed via neural architecture search that directly incorporated the performance metrics such as model latency into the searching algorithm objective function. Thereby the NAS algorithm will find out the best architecture by optimizing the trade-off between structure complexity and performance in terms of latency. However, instead of using common FLOPS as metrics performance, MnasNet measure the performance as respects to real-world inference latency of the model deployed on mobile phones.
+
+
 
 
 % ==========================
@@ -321,7 +331,7 @@ The accuracy and loss are considered as the evaluation metrics.
 \subsection{Model 4: Transfer learning with ResNet18}
 \subsubsection{Architecture}
 
-\subsection{Model 5 : Tensorflow with transfer learning}
+\subsection{Model 5 : Xception with transfer learning}
 This fifth model is still implemented with Tensorflow, but this time we used transfer learning as explained in Section \ref{transfer}.
 We used Xception and to reach the highest score we did some hyperparameters tuning. The parameters we tuned were the learning rate, the batch size, the number and dimension of Dense layers and the patience for early stopping callback.
 Initially we didn't use Dense layer, but we then notice that adding Dense layers we were able to reduce the gap between training accuracy and validation accuracy.
@@ -345,12 +355,14 @@ The accuracy and loss are considered as the evaluation metrics.
 
 
 % ========================
-% # IV. Results #
+% # IV. Results and  Discussion #
 % ========================
 
-\section{Results}
+\section{Results and Discussion}
 In this section, we show the experimental results of the proposed models. 
 \subsection{Transfer learning vs Learning from Scratch}
+According to the experiment of various models with transfer learning of ResNet18, MobilenetV2, EfficientNetB0, and MnasNet, training the model with pre-trained weights initialization can yield better than random weights initialization, which corresponds to this paper\cite{kornblith2019better}.
+
 Here  we can show the graphs of accuracy over epochs
 
 \begin{figure}[h]
@@ -360,73 +372,31 @@ Here  we can show the graphs of accuracy over epochs
 \label{bench}
 \end{figure}
 
-\begin{table}[h]
-\begin{threeparttable}
-\caption{Comparison of Transfer Learning Versus Learning From Scratch}
-\label{tab:2}
-\setlength\tabcolsep{0pt} % make LaTeX figure out intercolumn spacing
-
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}} ll cccc}
-\toprule
-     Architecture\tnote{a} & Setting\tnote{b} & 
-     \multicolumn{4}{c}{Accuracy (\%)} \\ 
-\cmidrule{3-6}
-     & & Acc & Precision & Recall & F1 \\
-\midrule
-     ResNet18 & from scratch & 66.6 & 38.5 & 49.5 & 51.5 \\
-     ResNet18 & transfer learning & 81.7 & 76.7 & 73.3 & 77.2 \\
-\addlinespace
-     WPD+CSP & SVM+NN [13] & 83.1 & 84.4 & 85.6 & 84.4 \\
-\addlinespace
-      4 band CSP (our method)& SVM & 93.3 & 77.5 & 85.8 & 85.5\\
-\bottomrule
-\end{tabular*}
-
-\smallskip
-\scriptsize
-\begin{tablenotes}
-\RaggedRight
-\item[a] AAR: Adaptive Autoregressive; 
-         CAR: Common Average Reference; 
-         CSP: Common Spatial Pattern;
-         WPD: Wavelet Packet Decomposition;
-         \dots
-\item[b] \dots
-\item[c] \dots
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
-
-
-
-\subsection{Performance on Various Architectures}
-In \ref{tab:2} we list the accuracy and performance benchmarks of the different architectures.
-
 \begin{table*}[h]
 \begin{threeparttable}
 \caption{Accuracy and Performance Benchmark on Various Networks Architectures}
 \label{tab:2}
 \setlength\tabcolsep{0pt} % make LaTeX figure out intercolumn spacing
 
-\begin{tabularx}{\textwidth}{@{}l*{10}{C}c@{}}
+\begin{tabularx}{\textwidth}{@{}l*{6}{C}c@{}}
 \toprule
-     Architecture\tnote{a} & Weight Initialization\tnote{b} & 
+     Architecture & Weight Initialization & 
      \multicolumn{4}{c}{Accuracy (\%)} & 
-     \multicolumn{3}{c}{Performance} \\
-\cmidrule{3-9}
-     & & Acc & Precision & Recall & F1-Score & Parameters (Millions) & GPU Consumption & BFLOPS \\
+     \multicolumn{1}{c}{Performance} \\
+\cmidrule{3-7}
+     & & Acc & Precision & Recall & F1-Score & Parameters (Millions) \\
 \midrule
-     Hand-craft1 & random & 99.3 & 99.3 & 99.3 & 99.3 & 6.5 & - & - \\
-     Hand-craft2 & random & 99.1 & 99.1 & 99.1 & 99.1 & 19.4 & - & - \\
-     ResNet18 \cite{He2016DeepRL} & random & 98.9 & 98.8 & 99.2 & 99.0 & 11.2 & - & - \\
-     ResNet18 \cite{He2016DeepRL} & pretrained & 99.2 & 98.6 & 100.0 & 99.3 & 11.2 & - & - \\
-     Xception \cite{xception} & pretrained & 99.4 & 99.4 & 99.4 & 99.4 & 22.3 & - & - \\
-     MobilenetV2 \cite{Sandler2018MobileNetV2IR} & random & 99.2 & 98.6 & 100.0 & 99.3 & 2.2 & - & - \\
-     MobilenetV2 \cite{Sandler2018MobileNetV2IR} & pretrained & 99.7 & 100.0 & 99.6 & 99.8 & 2.2 & - & - \\
-     Efficientnetb0 \cite{DBLP:journals/corr/abs-1905-11946} & random & 99.5 & 99.2 & 100.0 & 99.6 & 4.0 & - & - \\
-     Efficientnetb0 \cite{DBLP:journals/corr/abs-1905-11946} & pretrained & 99.4 & 99.0 & 100.0 & 99.5 & 4.0 & - & - \\
-     MnasNet \cite{Tan2019MnasNetPN} & random & 98.6 & 98.8 & 98.6 & 98.7 & 3.1 & - & - \\
-     MnasNet \cite{Tan2019MnasNetPN} & pretrained & 98.6 & 100.0 & 97.4 & 98.7 & 3.1 & - & - \\
+     Hand-craft1 & random & 99.3 & 99.3 & 99.3 & 99.3 & 6.5 \\
+     Hand-craft2 & random & 99.1 & 99.1 & 99.1 & 99.1 & 19.4  \\
+     ResNet18 \cite{He2016DeepRL} & random & 98.9 & 98.8 & 99.2 & 99.0 & 11.2 \\
+     ResNet18 \cite{He2016DeepRL} & pretrained & 99.2 & 98.6 & 100.0 & 99.3 & 11.2  \\
+     Xception \cite{xception} & pretrained & 99.4 & 99.4 & 99.4 & 99.4 & 22.3  \\
+     MobilenetV2 \cite{Sandler2018MobileNetV2IR} & random & 99.2 & 98.6 & 100.0 & 99.3 & 2.2  \\
+     MobilenetV2 \cite{Sandler2018MobileNetV2IR} & pretrained & 99.7 & 100.0 & 99.6 & 99.8 & 2.2 \\
+     Efficientnetb0 \cite{DBLP:journals/corr/abs-1905-11946} & random & 99.5 & 99.2 & 100.0 & 99.6 & 4.0 \\
+     Efficientnetb0 \cite{DBLP:journals/corr/abs-1905-11946} & pretrained & 99.4 & 99.0 & 100.0 & 99.5 & 4.0 \\
+     MnasNet \cite{Tan2019MnasNetPN} & random & 98.6 & 98.8 & 98.6 & 98.7 & 3.1 \\
+     MnasNet \cite{Tan2019MnasNetPN} & pretrained & 98.6 & 100.0 & 97.4 & 98.7 & 3.1 & \\
 \bottomrule
 \end{tabularx}
 
@@ -434,32 +404,20 @@ In \ref{tab:2} we list the accuracy and performance benchmarks of the different 
 \scriptsize
 \begin{tablenotes}
 \RaggedRight
-\item[a] AAR: Adaptive Autoregressive; 
-         CAR: Common Average Reference; 
-         CSP: Common Spatial Pattern;
-         WPD: Wavelet Packet Decomposition;
-         \dots
-\item[b] \dots
-\item[c] \dots
 \end{tablenotes}
 \end{threeparttable}
 \end{table*}
 
 
-
-% ========================
-% # IV. Discussion #
-% ========================
-\section{Discussion}
-\subsection{Random weights VS Pre-trained weights}
-According to the experiment of various models with transfer learning of ResNet18, MobilenetV2, EfficientNetB0, and MnasNet, training the model with pre-trained weights initialization can yield better than random weights initialization, which corresponds to this paper\cite{kornblith2019better}.
+\subsection{Performance on Various Architectures}
+In \ref{tab:2} we list the accuracy and performance benchmarks of the different architectures.
 
 
 % ==================
 % # Conclusion #
 % ==================
 \section{Conclusion}
-According to the experimental results, the dataset seems well prepared, so all the models performed accurately and achieve over 99\% accuracy. MobilenotV2 can give the best performance over the other models. Compared to other pre-trained models achieving similar accuracy, MobilenetV2 is much smaller than MnasNet, EfficientNetB0, and others. However, the simple model of CNNs, such as hand-craft CNN1, provides simple architecture, less complexity with high accuracy as well.
+In conformity with the experimental results, the dataset seems well prepared  as a consequence all the models performed accurately and achieved over 99\% both in accuracy and F1-score. Specifically, the MobilenetV2 model with pre-trained weight can result in the best performance over the other models in terms of accuracy and F1-score. Moreover, compared to other pre-trained models achieving similar accuracy including MnasNet or EfficientNetB0, MobilenetV2 is considerably much more smaller in the number of parameters as such is noticeably applicable to be implemented on any devices specifically edge or mobile as the MobilenetV2 originally designated for with competitive accuracy. However, the simple model of CNNs, such as hand-craft CNN1, provides simple architecture, less complexity with high accuracy as well.
 
 % ==================
 % # Acknowledgment #

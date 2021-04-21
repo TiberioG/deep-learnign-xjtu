@@ -2,7 +2,6 @@
 Code and presentation for the course Big Data and Deep Learning at XJTU
 
 
-
 ## Colab notebooks 
 The source .ipynb files of the different models are in [notebooks](notebooks) directory.
 Here we report also the links to Google Colab 
