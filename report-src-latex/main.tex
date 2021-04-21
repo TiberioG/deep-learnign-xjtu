@@ -37,7 +37,7 @@
 % ================
 
 \begin{abstract}
-Deep learning architectures including Convolutional Neural Networks (Convnets) have been broadly applied into diverse numbers of sectors such as surveillance due to high accuracy. Inspired by the recent situation on pandemic outbreaks and, concurrently, surveillance system application involvement in public using AI, we build Convenets architectures for binary image classification task of face mask classification. The aim of the project is to identify human face images wearing a mask and not wearing a mask. The experiments are based on a public dataset available on Kaggle that was collected combining Google searches and the CelebFace\cite{liu2015faceattributes} dataset. In this report we will discuss the classification performance of the different network architectures based on classification accuracy metrics, such as f1-score, and performance metrics including number of parameters. We are investigating the corollary of pre-trained networks for transfer learning as opposed to learning  from random initialization. 
+Deep learning architectures including Convolutional Neural Networks (Convnets) have been broadly applied into diverse numbers of sectors such as surveillance due to high accuracy. Inspired by the recent situation on pandemic outbreaks and, concurrently, surveillance system application involvement in public using AI, we build Convenets architectures for binary image classification task of face mask classification. The aim of the project is to identify human face images wearing a mask and not wearing a mask. The experiments are based on a public dataset available on Kaggle that was collected combining Google searches and the CelebFace dataset. In this report we will discuss the classification performance of the different network architectures based on classification accuracy metrics, such as f1-score, and performance metrics including number of parameters. We are investigating the corollary of pre-trained networks for transfer learning as opposed to learning  from random initialization. The experiments resulted that MobileNetV2 with ImageNet pre-trained weight is considerably superior among others with the high accuracy metrics along with its lightweight parameters which sum up its capability to be deployed into mobile or edge devices. Moreover, by simply training the task on simple naive hand-crafted Convnets, we can achieve very competitive high accuracy compared to other state-of-the-art sophisticated backbone. 
 \end{abstract}
 
 \begin{keywords}
@@ -132,14 +132,14 @@ In classification task, the dataset should have balance in the number of instanc
 Binary classification task aims to predict the label $\hat{y_{i}}$ given input $x_{i}$ with $\hat{y_{i}} \in \left \{ 0,1 \right \}$. Let the $\theta_{p}$ denotes the pre-trained weight from the ImageNet pre-trained model for features extraction. We used this pre-trained weight as initialization of the model $f(.;\theta_{p})$ while training on the batches of the dataset. While in this experiment, we did not freeze the features extractor and let the training steps fine-tune the weight of both features extractor and the classifier. Then, we has an objective to minimize the loss value to obtained best parameters $\theta$ given given image-label pairs in a batch approximately equivalent to dataset distribution $D$  
 
 \begin{equation}
-    \min_{\theta} \mathbb{E}_{\left ( x,y \right ) \sim  D} \left [ \mathcal{L}\left ( f(x;\theta), y \right ) \right ]
+    \min_{\theta} \mathbb{E}_{\left ( x,y \right ) \sim  D} \left [ \mathcal{L}_{BCE} \left ( f(x;\theta), y \right ) \right ]
 \end{equation}
-. In this context, we employ binary cross entropy loss or so called $BCE$ in short which measure the binary cross entropy between the target $y$ and the output $f(x)$ as following equation
+. In this context, we employ binary cross entropy loss $\mathcal{L}_{BCE}$ which measure the binary cross entropy between the target $y$ and the output $f(x)$ as following equation
 Eq.(\ref{eqn:binaryloss}) which the gradient with respect to this loss will be used as the learning projection in parameters space 
 
 \begin{equation}
 \label{eqn:binaryloss}
-BCE=-\frac{1}{N} \sum_{i=1}^{N} y_{i} \cdot \log \left(f\left(x_{i}\right)\right)+\left(1-y_{i}\right) \cdot \log \left(1-f\left(x_{i}\right)\right)
+\mathcal{L}_{BCE}=-\frac{1}{N} \sum_{i=1}^{N} y_{i} \cdot \log \left(f\left(x_{i}\right)\right)+\left(1-y_{i}\right) \cdot \log \left(1-f\left(x_{i}\right)\right)
 \end{equation}.
 
 \subsection{Architectures Variation}
@@ -328,8 +328,16 @@ This model used EfficientNetB0 as base model made available in Keras application
 The accuracy and loss are considered as the evaluation metrics.
 
 
-\subsection{Model 4: Transfer learning with ResNet18}
-\subsubsection{Architecture}
+\subsection{Model 4: Transfer learning with ResNet18, Mnasnet, and MobileNetV2}
+\subsubsection{Architecture} The model weight was initialized from Imagenet pre-trained model and then fine-tune the model into down-stream face-mask dataset. The model was implemented on top of PytorchLightning and was trained on single GPU.
+\subsubsection{Hyperparamters Tuning}
+\begin{itemize}
+    \item Loss function as Binary Crossentropy.
+    \item The learning rate is $1\times10^{-3}$.
+    \item Using Adam optimizer as the optimizer for training. 
+    \item number of epochs 20.
+    \item weight decay is 0.0005.
+\end{itemize}
 
 \subsection{Model 5 : Xception with transfer learning}
 This fifth model is still implemented with Tensorflow, but this time we used transfer learning as explained in Section \ref{transfer}.
@@ -352,26 +360,6 @@ the training time.
 
 \subsubsection{Evaluation Metrics}
 The accuracy and loss are considered as the evaluation metrics.
-
-
-% ========================
-% # IV. Results and  Discussion #
-% ========================
-
-\section{Results and Discussion}
-In this section, we show the experimental results of the proposed models. 
-\subsection{Transfer learning vs Learning from Scratch}
-According to the experiment of various models with transfer learning of ResNet18, MobilenetV2, EfficientNetB0, and MnasNet, training the model with pre-trained weights initialization can yield better than random weights initialization, which corresponds to this paper\cite{kornblith2019better}.
-
-Here  we can show the graphs of accuracy over epochs
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=3.6in]{performance_5.png}
-\caption{Showing the accuracy and loss in training and validation over epochs}
-\label{bench}
-\end{figure}
-
 \begin{table*}[h]
 \begin{threeparttable}
 \caption{Accuracy and Performance Benchmark on Various Networks Architectures}
@@ -408,9 +396,30 @@ Here  we can show the graphs of accuracy over epochs
 \end{threeparttable}
 \end{table*}
 
+% ========================
+% # IV. Results and  Discussion #
+% ========================
+
+\section{Results and Discussion}
+In this section, we show the experimental results of the proposed models. 
+\subsection{Transfer learning vs Learning from Scratch}
+According to the experiment of various models with transfer learning of ResNet18, MobilenetV2, EfficientNetB0, and MnasNet, training the model with pre-trained weights initialization can yield better than random weights initialization, which corresponds to this paper\cite{kornblith2019better}. 
+It is also evident that transfer learning yields to a high accuracy using less epochs, compared to the custom made CNNs.
+
+
+In Figure \ref{bench} we report the graphs of accuracy over epochs
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.6in]{performance_5.png}
+\caption{Showing the accuracy and loss in training and validation over epochs}
+\label{bench}
+\end{figure}
+
+It is interesting to notice that Xception transfer model had lot of fluctations in the accuracy and loss of validation set. That was a symptom of overfitting and could be further reduced by adding better regularization. 
 
 \subsection{Performance on Various Architectures}
-In \ref{tab:2} we list the accuracy and performance benchmarks of the different architectures.
+In Talbe \ref{tab:2} we list the accuracy and performance benchmarks of the different architectures. It is interesting to notice that for this specific task, increasing the number of parameters had not a huge impact on accuracy, because we can see how a 6.5 million parameter model (Hand-craft1) had almost the same performance of a 22.3 million one (Xception)
 
 
 % ==================
@@ -418,6 +427,8 @@ In \ref{tab:2} we list the accuracy and performance benchmarks of the different 
 % ==================
 \section{Conclusion}
 In conformity with the experimental results, the dataset seems well prepared  as a consequence all the models performed accurately and achieved over 99\% both in accuracy and F1-score. Specifically, the MobilenetV2 model with pre-trained weight can result in the best performance over the other models in terms of accuracy and F1-score. Moreover, compared to other pre-trained models achieving similar accuracy including MnasNet or EfficientNetB0, MobilenetV2 is considerably much more smaller in the number of parameters as such is noticeably applicable to be implemented on any devices specifically edge or mobile as the MobilenetV2 originally designated for with competitive accuracy. However, the simple model of CNNs, such as hand-craft CNN1, provides simple architecture, less complexity with high accuracy as well.
+
+Further developments can be done, such as testing the model with a video live source. In this case it can be useful to use first a segmentation model in order to detect faces in a photo frame and then use our models to detect if a person is wearing a mask or not. 
 
 % ==================
 % # Acknowledgment #
