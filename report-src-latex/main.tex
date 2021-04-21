@@ -13,6 +13,8 @@
 \usepackage[flushleft]{threeparttable}
 \usepackage{tabularx}
 \renewcommand\TPTtagStyle{\textit}
+\usepackage{pgfplots}
+\usepackage{filecontents}
 %+++++++++++++++++++++++++++++++++++++++++++++++++++
 
 \usepackage{verbatimbox}
@@ -176,9 +178,9 @@ Designed specifically for mobile device deployment, MnasNet\cite{Tan2019MnasNetP
 % # III. Experiments #
 % ==========================
 \section{Experiments}
-Colaboratory is a Google research project created to help disseminate machine learning education and research. It is a free cloud service and supports free GPU . It's a Jupyter notebook environment that requires no setup to use and runs entirely in the cloud.
+Colaboratory is a Google research project created to help disseminate machine learning education and research. It is a free cloud service and supports free GPU . It's a Jupyter Notebook environment that requires no setup to use and runs entirely in the cloud.
 
-In this experiments, we jointly write and run the code on the colab platform, we created different models based on the same dataset, but using different architectures and hyperparameters as shown in Table\ref{T1} and we compared them. Because we do not have access to high GPU computation resource in order to do grid search. The experimental models consist of two CNN hand-craft models and transfer learning with pre-trained models which are EfficientNetB0, Xception, ResNet18, MobilenetV2, and MnasNet. We also added image augmentation to the data generator as follows: horizontal flip 10 degree, rescale to 1/255, and image normalization. 
+In this experiments, we jointly write and run the code on the Google Colaboratory platform, we created different models based on the same dataset, but using different architectures and hyperparameters as shown in Table\ref{T1} and we compared them. Because we do not have access to high GPU computation resource in order to do grid search. The experimental models consist of two CNN hand-craft models and transfer learning with pre-trained models which are EfficientNetB0, Xception, ResNet18, MobilenetV2, and MnasNet. We also added image augmentation to the data generator as follows: horizontal flip 10 degree, rescale to 1/255, and image normalization. 
 
 \begin{table}[h]\centering
 %\small\sf
@@ -301,9 +303,9 @@ Non-trainable params: 0
 \label{table:mod1-arch}
 \end{table}
 
-\subsubsection{Hyperparamters Tuning}
+\subsubsection{Hyperparameters Tuning}
 \begin{itemize}
-    \item Since we are doing binary classification we choose \textit{Binary Crossentropy} as Loss function.
+    \item Since we are doing binary classification we choose \textit{Binary Cross Entropy} as Loss function.
     \item For learning rate we used $1E-4$
     \item As optimizer we used \textit{Adam} optimization, which is a momentum optimizer, so it uses an exponentially decaying average for past gradients but in addition it also keeps track of the decaying average for past squared gradients. 
     \item In order to avoid overfitting we used the early stop method setting \texttt{patience = 5}
@@ -316,9 +318,9 @@ We utilized EfficientNetB0\cite{DBLP:journals/corr/abs-1905-11946}  which is the
 \subsubsection{Architecture}
 This model used EfficientNetB0 as base model made available in Keras applications. To apply this pre-trained model to our purpose, we modified classifier from 1,000 classes to 2 classes by attaching fully connected layer. In the experiment, we tried both pre-trained weights and random weights.
 
-\subsubsection{Hyperparamters Tuning}
+\subsubsection{Hyperparameters Tuning}
 \begin{itemize}
-    \item Loss function as Binary Crossentropy.
+    \item Loss function as Binary Cross Entropy.
     \item The learning rate is $1\times10^{-5}$.
     \item Using Adam optimizer as the optimizer for training. 
     \item The early stop method was used to prevent overfitting during training with \texttt{patience = 5}.
@@ -329,10 +331,10 @@ The accuracy and loss are considered as the evaluation metrics.
 
 
 \subsection{Model 4: Transfer learning with ResNet18, Mnasnet, and MobileNetV2}
-\subsubsection{Architecture} The model weight was initialized from Imagenet pre-trained model and then fine-tune the model into down-stream face-mask dataset. The model was implemented on top of PytorchLightning and was trained on single GPU.
+\subsubsection{Architecture} The model weight was initialized from ImageNet pre-trained model and then fine-tune the model into down-stream face-mask dataset. The model was implemented on top of PytorchLightning and was trained on single GPU.
 \subsubsection{Hyperparamters Tuning}
 \begin{itemize}
-    \item Loss function as Binary Crossentropy.
+    \item Loss function as Binary Cross Entropy.
     \item The learning rate is $1\times10^{-3}$.
     \item Using Adam optimizer as the optimizer for training. 
     \item number of epochs 20.
@@ -390,9 +392,6 @@ The accuracy and loss are considered as the evaluation metrics.
 
 \smallskip
 \scriptsize
-\begin{tablenotes}
-\RaggedRight
-\end{tablenotes}
 \end{threeparttable}
 \end{table*}
 
@@ -402,9 +401,49 @@ The accuracy and loss are considered as the evaluation metrics.
 
 \section{Results and Discussion}
 In this section, we show the experimental results of the proposed models. 
-\subsection{Transfer learning vs Learning from Scratch}
-According to the experiment of various models with transfer learning of ResNet18, MobilenetV2, EfficientNetB0, and MnasNet, training the model with pre-trained weights initialization can yield better than random weights initialization, which corresponds to this paper\cite{kornblith2019better}. 
-It is also evident that transfer learning yields to a high accuracy using less epochs, compared to the custom made CNNs.
+
+\subsection{Transfer learning Compared to Learning from Scratch}
+Analyzing the influence of transfer learning by utilizing pre-trained from ImageNet model is the one of the objectives that we will discuss in this section.  
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[xlabel={Step},
+    ylabel={Loss},
+    legend style={anchor=north east, font=\fontsize{8}{8}\selectfont}]
+    
+    % efficientnet random
+    \addplot[blue, mark=halfcircle] table [x=Step, y=Value, col sep=comma] {logs/run-efficientnet_b0_from_scratch_version_0-tag-train_loss_epoch.csv};
+    
+    % efficientnet pre-trained
+    \addplot[red, mark=halfcircle] table [x=Step, y=Value, col sep=comma] {logs/run-efficientnet_b0_pretrained_version_0-tag-train_loss_epoch.csv};
+    
+    % mnasnet random
+    \addplot[blue, mark=x] table [x=Step, y=Value, col sep=comma] {logs/run-mnasnet_100_from_scratch_version_0-tag-train_loss_epoch.csv};
+    
+    % mnasnet pre-trained
+    \addplot[red, mark=x] table [x=Step, y=Value, col sep=comma] {logs/run-mnasnet_100_pretrained_version_0-tag-train_loss_epoch.csv};
+    
+    % mobilenet random
+    \addplot[blue, mark=square] table [x=Step, y=Value, col sep=comma] {logs/run-mobilenetv2_100_from_scratch_version_0-tag-train_loss_epoch.csv};
+    
+    % mobilenet pre-trained
+    \addplot[red, mark=square] table [x=Step, y=Value, col sep=comma] {logs/run-mobilenetv2_100_pretrained_version_0-tag-train_loss_epoch.csv};
+    
+    % resnet random
+    \addplot[blue, mark=+] table [x=Step, y=Value, col sep=comma] {logs/run-resnet18_from_scratch_version_0-tag-train_loss_epoch.csv};
+    
+    % resnet pre-trained
+    \addplot[red, mark=+] table [x=Step, y=Value, col sep=comma] {logs/run-resnet18_pretrained_version_0-tag-train_loss_epoch.csv};
+    \legend{EfficientNetb0-Random, EfficientNetb0-Pretrained, MnasNet-Random, MnasNet-Pretrained, MobileNetV2-Random, MobileNetV2-Pretrained, ResNet18-Random, ResNet18-Pretrained}
+    
+    \end{axis}
+    \end{tikzpicture}    
+    \caption{Training loss profile of our pre-trained models and models trained from random initialization}
+    \label{fig:training_loss}
+\end{figure}
+
+According to the experiment of various models with transfer learning of ResNet18, MobilenetV2, EfficientNetB0, and MnasNet, training the model with pre-trained weights initialization can yield better than random weights initialization, which corresponds to this paper\cite{kornblith2019better}. It is also evident that transfer learning yields to a high accuracy using less epochs, compared to the custom made CNNs as shown in the Figure \ref{fig:training_loss}. Most of the pre-trained-initialization models colored in red lines exhibited earlier convergence while training the downstream task which roughly required 2 epochs training in order to achieve convergence. Meanwhile, the models from random initialization or so called learning from scratch took $>$ 5 epochs to converge.
 
 
 In Figure \ref{bench} we report the graphs of accuracy over epochs
@@ -416,10 +455,10 @@ In Figure \ref{bench} we report the graphs of accuracy over epochs
 \label{bench}
 \end{figure}
 
-It is interesting to notice that Xception transfer model had lot of fluctations in the accuracy and loss of validation set. That was a symptom of overfitting and could be further reduced by adding better regularization. 
+It is interesting to notice that Xception transfer model had lot of fluctuations in the accuracy and loss of validation set. That was a symptom of overfitting and could be further reduced by adding better regularization. 
 
 \subsection{Performance on Various Architectures}
-In Talbe \ref{tab:2} we list the accuracy and performance benchmarks of the different architectures. It is interesting to notice that for this specific task, increasing the number of parameters had not a huge impact on accuracy, because we can see how a 6.5 million parameter model (Hand-craft1) had almost the same performance of a 22.3 million one (Xception)
+In Table \ref{tab:2} we list the accuracy and performance benchmarks of the different architectures. It is interesting to notice that for this specific task, increasing the number of parameters had not a huge impact on accuracy, because we can see how a 6.5 million parameter model (Hand-craft1) had almost the same performance of a 22.3 million one (Xception). In addition, we can analyze that the majority of the model initialized from ImageNet pre-trained are proven to be more accurate in all the accuracy and F1-Score opposed to training the model from random initialization. 
 
 
 % ==================
