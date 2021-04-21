@@ -24,5 +24,9 @@ Here we report also the links to Google Colab
   
 
 * PytorchLightning Trainer
-[Google Colab](https://colab.research.google.com/drive/1BE9cgorQsuubnlByoPnFol8lsbvaA0jm?usp=sharing)  
+[Google Colab](https://colab.research.google.com/drive/1BE9cgorQsuubnlByoPnFol8lsbvaA0jm?usp=sharing) 
+
+
+* 5 Model comparison
+[Google Colab](https://colab.research.google.com/drive/1qqW2jznefjjI91CtEXEFEi7nbNnbklgx?usp=sharing)  
   
