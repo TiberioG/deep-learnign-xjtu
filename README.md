@@ -7,8 +7,16 @@ Code and presentation for the course Big Data and Deep Learning at XJTU
 The source .ipynb files of the different models are in [notebooks](notebooks) directory.
 Here we report also the links to Google Colab 
 
+* Model 1
+[Google Colab](https://colab.research.google.com/drive/1QkJGJK1YNt-SifIpQ2sXr8xUNWGMIMwg?usp=sharing)  
+
+
 * Model 2
 [Google Colab](https://colab.research.google.com/drive/1ViCJEwRnWKTodXfFBpLmDDJTs7Z7Wxi1?usp=sharing)  
+
+
+* Model 3
+[Google Colab](https://colab.research.google.com/drive/1yiusZHq6SP69701I0msRwXGf2B1wgrhq?usp=sharing)  
   
 
 * Model 5
